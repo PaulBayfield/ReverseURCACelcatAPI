@@ -1,4 +1,5 @@
 from .agenda.v1_agenda import bp as RouteAgenda
+from .service.v1_service import bp as RouteService
 
 
 # Meta données de la version
@@ -7,6 +8,7 @@ __author__ = "Paul Bayfield"
 __description__ = "/v1 pour l'API ReverseURCACelcat"
 __routes__ = [
     RouteAgenda,
+    RouteService
 ]
 
 
