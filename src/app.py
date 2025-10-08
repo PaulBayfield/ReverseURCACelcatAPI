@@ -30,15 +30,13 @@ app.ext.openapi.raw(
         "servers": [
             {
                 "url": f"{environ.get('API_DOMAIN')}",
-                "description": "Serveur de production"
+                "description": "Serveur de production",
             }
         ],
     }
 )
 
-year = datetime.now(
-    tz=timezone("Europe/Paris")
-).year
+year = datetime.now(tz=timezone("Europe/Paris")).year
 
 app.ext.openapi.describe(
     title=app.name,
@@ -100,7 +98,7 @@ ErrorHandler(app)
 @app.listener("before_server_start")
 async def setup_app(app: Sanic, loop):
     app.ctx.session = ClientSession()
-    
+
     app.ctx.client = Client(
         session=app.ctx.session,
     )
@@ -108,9 +106,7 @@ async def setup_app(app: Sanic, loop):
         username=environ.get("URCA_USERNAME"),
         password=environ.get("URCA_PASSWORD"),
     )
-    app.ctx.client_created = datetime.now(
-        tz=timezone("Europe/Paris")
-    )
+    app.ctx.client_created = datetime.now(tz=timezone("Europe/Paris"))
 
     print("API démarrée")
 
@@ -120,3 +116,28 @@ async def close_app(app: Sanic, loop):
     await app.ctx.session.close()
 
     print("API arrêtée")
+
+
+@app.on_response
+async def after_request(request, response):
+    """
+    Vérifie si le client doit être régénéré (toutes les 6 heures)
+
+    :param request: Request
+    :param response: Response
+    """
+    if (
+        datetime.now(tz=timezone("Europe/Paris")) - request.app.ctx.client_created
+    ).total_seconds() >= 21600:
+        print("Le client a plus de 6 heures, régénération...")
+
+        client = Client(
+            session=request.app.ctx.session,
+        )
+        await client.login(
+            username=environ.get("URCA_USERNAME"),
+            password=environ.get("URCA_PASSWORD"),
+        )
+        request.app.ctx.client = client
+
+        request.app.ctx.client_created = datetime.now(tz=timezone("Europe/Paris"))
