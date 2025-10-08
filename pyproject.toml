@@ -1,0 +1,22 @@
+[project]
+name = "reverse-urca-celcat-api"
+version = "1.1.0"
+description = "Reverse URCA Celcat API"
+authors = ["Paul Bayfield"]
+license = "Apache-2.0"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "aiohttp>=3.11.13",
+    "bs4>=0.0.2",
+    "jinja2>=3.1.6",
+    "prometheus-client>=0.23.1",
+    "python-dotenv>=1.0.1",
+    "pytz>=2025.1",
+    "redis>=5.2.1",
+    "sanic>=24.12.0",
+    "sanic-ext",
+]
+
+[tool.uv.sources]
+sanic-ext = { git = "https://github.com/PaulBayfield/sanic-ext" }
