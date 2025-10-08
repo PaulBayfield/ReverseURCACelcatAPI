@@ -1,7 +1,6 @@
 from .ratelimit import ratelimit
 from .response import JSON
 from ..exceptions.ratelimit import RatelimitException
-from ..exceptions.forbidden import ForbiddenException
 from sanic import Sanic
 from sanic.exceptions import NotFound, SanicException
 
@@ -24,16 +23,6 @@ class ErrorHandler:
                 request=request,
                 success=False,
                 message="La ressource demandée n'existe pas.",
-                status=exception.status_code
-            ).generate()
-
-
-        @app.exception(ForbiddenException)
-        async def handle_forbidden(request, exception):
-            return JSON(
-                request=request,
-                success=False,
-                message=exception.message,
                 status=exception.status_code
             ).generate()
 
