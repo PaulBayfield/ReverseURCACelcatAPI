@@ -128,16 +128,20 @@ async def after_request(request, response):
     """
     if (
         datetime.now(tz=timezone("Europe/Paris")) - request.app.ctx.client_created
-    ).total_seconds() >= 21600:
-        print("Le client a plus de 6 heures, régénération...")
+    ).total_seconds() >= 3600:
+        print("Le client a plus de 1 heures, régénération...")
+
+        new_session = ClientSession()
 
         client = Client(
-            session=request.app.ctx.session,
+            session=new_session,
         )
         await client.login(
             username=environ.get("URCA_USERNAME"),
             password=environ.get("URCA_PASSWORD"),
         )
         request.app.ctx.client = client
+        await request.app.ctx.session.close()
+        request.app.ctx.session = new_session
 
         request.app.ctx.client_created = datetime.now(tz=timezone("Europe/Paris"))
